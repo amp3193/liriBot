@@ -3,6 +3,7 @@ require('dotenv').config();
 var keys = require("./keys.js");
 var Spotify = require('node-spotify-api');
 var spotify = new Spotify(keys.spotify);
+var axios = require("axios");
 var fs = require("fs");
 
 if (process.argv.length < 3) {
@@ -18,7 +19,7 @@ function doCommand(command, arg) {
     if (arg) {
         // TODO strip off quotes
     }
-    
+
     switch (command) {
         case 'concert-this': {
             concertThis(arg);
@@ -44,27 +45,62 @@ function doCommand(command, arg) {
 }
 
 function concertThis(artist) {
-    // TODO
+    var artist = process.argv.slice(2).join("+");
+ 
+
+    var queryUrl = "http://bandsintown" + artist + "&y=&plot=short&apikey=trilogy";
+    // TODO make this apply to BandsIntown get correct URL
+    axios.get(queryUrl).then(
+        function (response) {
+            console.log("You Entered " + response.data.Title);
+            console.log("Release Date " + response.data.Released);
+            // TODO add rest of Data
+        }
+    )
     console.log("concertThis is being called " + artist);
 }
 
 function spotifyThis(song) {
-    // TODO
+    var song = process.argv.slice(2).join("+");
+    var key = Spotify(keys.spotify);
+
+    var queryUrl = "http://spotify" + song + "&apikey=" + key;
+    // TODO Get correct spotify URL
+
+    Spotify.get(queryUrl).then(
+        function (response) {
+            console.log("You Entered " + response.data.Title);
+            console.log("Release Date " + response.data.Released);
+            // TODO add rest of data responses
+        }
+    )
+
+
     console.log("spotifyThis is being called " + song);
 }
 
 function movieThis(movie) {
-    // TODO
+    var movie = process.argv.slice(2).join("+");
+    var queryUrl = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
+
+    axios.get(queryUrl).then(
+        function (response) {
+            console.log("You Entered " + response.data.Title);
+            console.log("Release Date " + response.data.Released);
+            // TODO add rest of data
+        }
+    );
+
     console.log("movieThis is being called " + movie);
 }
 
 function doIt() {
     console.log("DoIt is being called");
-    fs.readFile('./random.txt', 'utf8', function(error, data) {
+    fs.readFile('./random.txt', 'utf8', function (error, data) {
         const randomText = data.split(",");
         console.log(randomText);
         doCommand(randomText[0], randomText[1]);
-    }); 
+    });
 }
 
 function printUsage() {
