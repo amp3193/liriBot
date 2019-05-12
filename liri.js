@@ -16,7 +16,7 @@ if (process.argv.length < 3) {
 }
 
 function doCommand(command, arg, shouldLog) {
-    console.log(`Command: ${command}, Argument: ${arg}`)
+    //console.log(`Command: ${command}, Argument: ${arg}`)
 
     switch (command) {
         case 'concert-this': {
@@ -42,6 +42,13 @@ function doCommand(command, arg, shouldLog) {
         }
         case 'do-what-it-says': {
             doIt();
+            if (shouldLog) {
+                logIt(command, arg);
+            }
+            break;
+        }
+        case 'book-this': {
+            bookThis(arg);
             if (shouldLog) {
                 logIt(command, arg);
             }
@@ -108,11 +115,11 @@ function spotifyThis(song) {
         } else {
             var songs = response.tracks.items;
             for (var i = 0; i < songs.length; i++) {
-                console.log("\n***** Liri Found your Song! *****" + 
-                "\n* Artist(s): " + songs[i].artists[0].name +
-                "\n* Title: " + songs[i].name +
-                "\n* Preview Link: " + songs[i].artists[0].external_urls.spotify +
-                "\n* Album: " + songs[i].album.name);
+                console.log("\n***** Liri Found your Song! *****" +
+                    "\n* Artist(s): " + songs[i].artists[0].name +
+                    "\n* Title: " + songs[i].name +
+                    "\n* Preview Link: " + songs[i].artists[0].external_urls.spotify +
+                    "\n* Album: " + songs[i].album.name);
             }
         }
     });
@@ -127,15 +134,15 @@ function movieThis(movie) {
 
     axios.get(queryUrl)
         .then(function (response) {
-            console.log("***** Liri found your movie! *****\n" +
-                "* " + response.data.Title + "\n" +
-                "* Year Made: " + response.data.Year + "\n" +
-                "* IMDB Rating: " + response.data.imdbRating + "\n" +
-                "* Rotten Tomatoes Score: " + response.data.Ratings[1].Value + "\n" +
-                "* Made in: " + response.data.Country + "\n" +
-                "* Language: " + response.data.Language + "\n" +
-                "* Plot: " + response.data.Plot + "\n" +
-                "* Actors: " + response.data.Actors);
+            console.log("\n***** Liri found your movie! *****" +
+                "\n* Title: " + response.data.Title +
+                "\n* Year Made: " + response.data.Year +
+                "\n* IMDB Rating: " + response.data.imdbRating +
+                "\n* Rotten Tomatoes Score: " + response.data.Ratings[1].Value +
+                "\n* Made in: " + response.data.Country +
+                "\n* Language: " + response.data.Language +
+                "\n* Plot: " + response.data.Plot +
+                "\n* Actors: " + response.data.Actors);
         })
 
         .catch(function (error) {
@@ -156,7 +163,7 @@ function logIt(command, arg) {
         if (err) throw err;
     });
 }
-    
+
 function printUsage() {
     console.log("***** Liri does not understand. *****")
 }
@@ -174,50 +181,24 @@ function repeatIt() {
         }
     });
 }
-/*
 
-==============================================
-// concert-this
-//node liri.js concert-this <artist/band name here>
+function bookThis(title) {
+    if (!title || title === '') {
+        console.log("***** Liri needs a valid Title! *****")
+    } else {
+        let queryUrl = "https://www.googleapis.com/books/v1/volumes?q=" + title + "&key=AIzaSyAY4_-Mqs42ukF38ViEQpSWkBEsOdSiBdA";
 
-Name of the venue
-Venue location
-Date of the Event (use moment to format this as "MM/DD/YYYY")
+        axios.get(queryUrl)
+            .then(function (response) {
+                console.log("\n***** Liri found your Book! *****" +
+                    "\n* Title: " + response.data.items[0].volumeInfo.title + 
+                    "\n* Written By: " + response.data.items[0].volumeInfo.authors +
+                    "\n* Description: " + response.data.items[0].volumeInfo.description +
+                    "\n* For Purchase at: " + response.data.items[0].saleInfo.buyLink);
+            })
 
-==============================================
-// spotify-this-song
-node liri.js spotify-this-song '<song name here>'
-This will show the following information about the song in your terminal/bash window
-
-Artist(s)
-The song's name
-A preview link of the song from Spotify
-The album that the song is from
-
-If no song is provided then your program will default to "The Sign" by Ace of Base.
-
-==============================================
-// movie-this
-node liri.js movie-this '<movie name here>'
-
-This will output the following information to your terminal/bash window:
-  * Title of the movie.
-  * Year the movie came out.
-  * IMDB Rating of the movie.
-  * Rotten Tomatoes Rating of the movie.
-  * Country where the movie was produced.
-  * Language of the movie.
-  * Plot of the movie.
-  * Actors in the movie.
-
-If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
-
-==============================================
-// do-what-it-says
-node liri.js do-what-it-says
-
-Using the fs Node package, LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.
-It should run spotify-this-song for "I Want it That Way," as follows the text in random.txt.
-Edit the text in random.txt to test out the feature for movie-this and concert-this.
-
-*/
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+}
