@@ -12,30 +12,43 @@ if (process.argv.length < 3) {
 } else {
     const command = process.argv[2];
     const arg = process.argv.slice(3).join(" ");
-    doCommand(command, arg);
+    doCommand(command, arg, true);
 }
 
-function doCommand(command, arg) {
+function doCommand(command, arg, shouldLog) {
     console.log(`Command: ${command}, Argument: ${arg}`)
-    if (arg) {
-        // TODO strip off quotes
-    }
 
     switch (command) {
         case 'concert-this': {
             concertThis(arg);
+            if (shouldLog) {
+                logIt(command, arg);
+            }
             break;
         }
         case 'spotify-this-song': {
             spotifyThis(arg);
+            if (shouldLog) {
+                logIt(command, arg);
+            }
             break;
         }
         case 'movie-this': {
             movieThis(arg);
+            if (shouldLog) {
+                logIt(command, arg);
+            }
             break;
         }
         case 'do-what-it-says': {
             doIt();
+            if (shouldLog) {
+                logIt(command, arg);
+            }
+            break;
+        }
+        case 'repeat-this-log': {
+            repeatIt();
             break;
         }
         default: {
@@ -50,7 +63,7 @@ function concertThis(artist) {
         console.log("***** Liri needs a valid Artist! *****")
     } else {
         let queryUrl = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
-    
+
         axios.get(queryUrl)
             .then(allConcerts)
             .catch(function (error) {
@@ -80,23 +93,29 @@ function allConcerts(response) {
 }
 
 function spotifyThis(song) {
-
     if (!song || song === '') {
         song = 'The Sign';
-    } else {
+    }
 
-        spotify.search({ type: 'track', query: song }, function(err, response) {
-            if (err) {
-              return console.log('Error occurred: ' + err);
-            } else {
-                //song = response.tracks.items;
-
-                console.log(song); 
+    spotify.search({
+        type: "track",
+        query: song,
+        limit: 5
+    }, function (err, response) {
+        //console.log(JSON.stringify(response, undefined, 3));
+        if (err) {
+            console.log('Error occurred: ' + err);
+        } else {
+            var songs = response.tracks.items;
+            for (var i = 0; i < songs.length; i++) {
+                console.log("\n***** Liri Found your Song! *****" + 
+                "\n* Artist(s): " + songs[i].artists[0].name +
+                "\n* Title: " + songs[i].name +
+                "\n* Preview Link: " + songs[i].artists[0].external_urls.spotify +
+                "\n* Album: " + songs[i].album.name);
             }
-           
-          
-          });
-}
+        }
+    });
 }
 
 function movieThis(movie) {
@@ -125,18 +144,36 @@ function movieThis(movie) {
 }
 
 function doIt() {
-    console.log("DoIt is being called");
     fs.readFile('./random.txt', 'utf8', function (error, data) {
         const randomText = data.split(",");
         console.log("***** Liri will do it! ***** " + randomText);
-        doCommand(randomText[0], randomText[1]);
+        doCommand(randomText[0], randomText[1], false);
     });
 }
 
+function logIt(command, arg) {
+    fs.appendFile('./log.txt', `${command},${arg}\n`, function (err) {
+        if (err) throw err;
+    });
+}
+    
 function printUsage() {
     console.log("***** Liri does not understand. *****")
 }
 
+function repeatIt() {
+    fs.readFile('./log.txt', 'utf8', function (error, data) {
+        console.log("***** Liri will Repeat your Log! ***** ");
+        const logText = data.split("\n");
+        for (let i = 0; i < logText.length; i++) {
+            const logEach = logText[i].trim();
+            if (logEach.length > 0) {
+                const lText = logEach.split(",");
+                doCommand(lText[0], lText[1], false);
+            }
+        }
+    });
+}
 /*
 
 ==============================================
