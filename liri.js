@@ -1,8 +1,9 @@
 require('dotenv').config();
 
-// var keys = require("./keys.js");
-// var Spotify = require('node-spotify-api');
-// var spotify = new Spotify(keys.spotify);
+var keys = require("./keys.js");
+var Spotify = require('node-spotify-api');
+var spotify = new Spotify(keys.spotify);
+const moment = require("moment");
 var axios = require("axios");
 var fs = require("fs");
 
@@ -10,12 +11,12 @@ if (process.argv.length < 3) {
     printUsage();
 } else {
     const command = process.argv[2];
-    const arg = process.argv[3];
-    console.log(process.argv);
+    const arg = process.argv.slice(3).join(" ");
     doCommand(command, arg);
 }
 
 function doCommand(command, arg) {
+    console.log(`Command: ${command}, Argument: ${arg}`)
     if (arg) {
         // TODO strip off quotes
     }
@@ -45,64 +46,82 @@ function doCommand(command, arg) {
 }
 
 function concertThis(artist) {
-    var artist = process.argv.slice(2).join("+");
- 
-
-    var queryUrl = "http://bandsintown" + artist + "&y=&plot=short&apikey=trilogy";
-    // TODO make this apply to BandsIntown get correct URL
-    axios.get(queryUrl)
-    .then(function (response) {
-            console.log("****** Liri found your Concert! ***** " + response.data.Title);
-            // TODO add rest of Data
-        })
-
-
-    console.log("concertThis is being called " + artist);
+    if (!artist || artist === '') {
+        console.log("***** Liri needs a valid Artist! *****")
+    } else {
+        let queryUrl = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
+    
+        axios.get(queryUrl)
+            .then(allConcerts)
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
 }
 
-// function spotifyThis(song) {
-//     var song = process.argv.slice(2).join("+");
-//     var key = Spotify(keys.spotify);
+function allConcerts(response) {
+    let maxResults = response.data.length;
+    console.log(`****** Liri found ${response.data.length} concerts! *****`);
 
-//     var queryUrl = "http://spotify" + song + "&apikey=" + key;
-//     // TODO Get correct spotify URL
+    if (maxResults > 5) {
+        maxResults = 5;
+        console.log("***** Displaying the first 5... *****");
+    }
 
-//     Spotify.get(queryUrl).then(
-//         function (response) {
-//             console.log("You Entered " + response.data.Title);
-//             console.log("Release Date " + response.data.Released);
-//             // TODO add rest of data responses
-//         }
-//     )
+    for (let i = 0; i < maxResults; i++) {
+        const allConcerts = response.data[i];
+        const date = moment(allConcerts.datetime).format('MM/DD/YYYY');
+        console.log(
+            "\n* Artists: " + allConcerts.lineup +
+            "\n* Venue: " + allConcerts.venue.name +
+            "\n* Location: " + allConcerts.venue.city +
+            "\n* Date of Show: " + date);
+    }
+}
 
+function spotifyThis(song) {
 
-//     console.log("spotifyThis is being called " + song);
-//}
+    if (!song || song === '') {
+        song = 'The Sign';
+    } else {
+
+        spotify.search({ type: 'track', query: song }, function(err, response) {
+            if (err) {
+              return console.log('Error occurred: ' + err);
+            } else {
+                //song = response.tracks.items;
+
+                console.log(song); 
+            }
+           
+          
+          });
+}
+}
 
 function movieThis(movie) {
-    var movie = process.argv.slice(3).join(" + ");
-   
-    var queryUrl = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
+    if (!movie || movie === '') {
+        movie = 'Mr. Nobody';
+    }
+
+    let queryUrl = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
 
     axios.get(queryUrl)
-    .then(function (response) {
-            console.log("***** Liri found your movie! *****\n"  
-            + "* " + response.data.Title + "\n" 
-            + "* Year Made: " + response.data.Year + "\n" 
-            + "* IMDB Rating: " + response.data.imdbRating + "\n"
-            + "* Rotten Tomatoes Score: " + response.data.Ratings[1].Value + "\n" 
-            + "* Made in: " + response.data.Country + "\n"
-            + "* Language: " + response.data.Language + "\n"
-            + "* Plot: " + response.data.Plot + "\n"
-            + "* Actors: " + response.data.Actors);
-     })
-    
-    .catch(function (error) {
-      console.log(error);
-    });
-        
+        .then(function (response) {
+            console.log("***** Liri found your movie! *****\n" +
+                "* " + response.data.Title + "\n" +
+                "* Year Made: " + response.data.Year + "\n" +
+                "* IMDB Rating: " + response.data.imdbRating + "\n" +
+                "* Rotten Tomatoes Score: " + response.data.Ratings[1].Value + "\n" +
+                "* Made in: " + response.data.Country + "\n" +
+                "* Language: " + response.data.Language + "\n" +
+                "* Plot: " + response.data.Plot + "\n" +
+                "* Actors: " + response.data.Actors);
+        })
 
-    //console.log("movieThis is being called " + movie);
+        .catch(function (error) {
+            console.log(error);
+        });
 }
 
 function doIt() {
@@ -119,10 +138,7 @@ function printUsage() {
 }
 
 /*
-switch on user input argv[2]
 
-switch
-argv[3] may or may not exist
 ==============================================
 // concert-this
 //node liri.js concert-this <artist/band name here>
