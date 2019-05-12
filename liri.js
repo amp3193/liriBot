@@ -1,8 +1,8 @@
 require('dotenv').config();
 
-var keys = require("./keys.js");
-var Spotify = require('node-spotify-api');
-var spotify = new Spotify(keys.spotify);
+// var keys = require("./keys.js");
+// var Spotify = require('node-spotify-api');
+// var spotify = new Spotify(keys.spotify);
 var axios = require("axios");
 var fs = require("fs");
 
@@ -50,61 +50,72 @@ function concertThis(artist) {
 
     var queryUrl = "http://bandsintown" + artist + "&y=&plot=short&apikey=trilogy";
     // TODO make this apply to BandsIntown get correct URL
-    axios.get(queryUrl).then(
-        function (response) {
-            console.log("You Entered " + response.data.Title);
-            console.log("Release Date " + response.data.Released);
+    axios.get(queryUrl)
+    .then(function (response) {
+            console.log("****** Liri found your Concert! ***** " + response.data.Title);
             // TODO add rest of Data
-        }
-    )
+        })
+
+
     console.log("concertThis is being called " + artist);
 }
 
-function spotifyThis(song) {
-    var song = process.argv.slice(2).join("+");
-    var key = Spotify(keys.spotify);
+// function spotifyThis(song) {
+//     var song = process.argv.slice(2).join("+");
+//     var key = Spotify(keys.spotify);
 
-    var queryUrl = "http://spotify" + song + "&apikey=" + key;
-    // TODO Get correct spotify URL
+//     var queryUrl = "http://spotify" + song + "&apikey=" + key;
+//     // TODO Get correct spotify URL
 
-    Spotify.get(queryUrl).then(
-        function (response) {
-            console.log("You Entered " + response.data.Title);
-            console.log("Release Date " + response.data.Released);
-            // TODO add rest of data responses
-        }
-    )
+//     Spotify.get(queryUrl).then(
+//         function (response) {
+//             console.log("You Entered " + response.data.Title);
+//             console.log("Release Date " + response.data.Released);
+//             // TODO add rest of data responses
+//         }
+//     )
 
 
-    console.log("spotifyThis is being called " + song);
-}
+//     console.log("spotifyThis is being called " + song);
+//}
 
 function movieThis(movie) {
-    var movie = process.argv.slice(2).join("+");
+    var movie = process.argv.slice(3).join(" + ");
+   
     var queryUrl = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
 
-    axios.get(queryUrl).then(
-        function (response) {
-            console.log("You Entered " + response.data.Title);
-            console.log("Release Date " + response.data.Released);
-            // TODO add rest of data
-        }
-    );
+    axios.get(queryUrl)
+    .then(function (response) {
+            console.log("***** Liri found your movie! *****\n"  
+            + "* " + response.data.Title + "\n" 
+            + "* Year Made: " + response.data.Year + "\n" 
+            + "* IMDB Rating: " + response.data.imdbRating + "\n"
+            + "* Rotten Tomatoes Score: " + response.data.Ratings[1].Value + "\n" 
+            + "* Made in: " + response.data.Country + "\n"
+            + "* Language: " + response.data.Language + "\n"
+            + "* Plot: " + response.data.Plot + "\n"
+            + "* Actors: " + response.data.Actors);
+     })
+    
+    .catch(function (error) {
+      console.log(error);
+    });
+        
 
-    console.log("movieThis is being called " + movie);
+    //console.log("movieThis is being called " + movie);
 }
 
 function doIt() {
     console.log("DoIt is being called");
     fs.readFile('./random.txt', 'utf8', function (error, data) {
         const randomText = data.split(",");
-        console.log(randomText);
+        console.log("***** Liri will do it! ***** " + randomText);
         doCommand(randomText[0], randomText[1]);
     });
 }
 
 function printUsage() {
-    console.log("Liri does not understand.")
+    console.log("***** Liri does not understand. *****")
 }
 
 /*
