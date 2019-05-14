@@ -168,7 +168,15 @@ function doCommand(command, arg, shouldLog) {
     }
 
     function printUsage() {
-        console.log(chalk.bgYellow.bold("***** Liri does not understand. *****"))
+        console.log(chalk.cyan.bold(`
+            \n***** Hello I'm Liri! ***** 
+            \nPlease type one of the following commands and add what you'd like to find after it: 
+            \n* To Find a Concert: concert-this 
+            \n* To Find a Movie: movie-this
+            \n* To Find a Song: spotify-this-song
+            \n* To Find a Book: book-this
+            \n* Try this for something random: do-what-it-says
+            \n* Try this to repeat all of your previous commands: repeat-this-log`));
     }
 
     function repeatIt() {
