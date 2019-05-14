@@ -4,10 +4,10 @@ Hello I'm Liri!
 Liri is a command line app that returns a queried movie, concert, song or book when the user enters data. Liri can perform a random action read from a text file. Liri also stores a log of the user's commands and can perform them again repeating all of the queries.
 
 Video of LiriBot commands
-![concert-this](https://github.com/amp3193/liriBot/blob/master/screen_shots/LiriBot.webm)
+![concert-this](https://github.com/amp3193/liriBot/blob/master/screen_shots/LiriBot_1.gif)
 
 Video of Invalid commands
-![Errors](https://github.com/amp3193/liriBot/blob/master/screen_shots/ErrorExamples.webm)
+![Errors](https://github.com/amp3193/liriBot/blob/master/screen_shots/ErrorExamples.gif)
 
 How to Use Liri: 
 Please type one of the following commands and add what you'd like to find after it:
