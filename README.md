@@ -21,5 +21,5 @@ Please type one of the following commands and add what you'd like to find after 
 How did you make Liri?
 Liri is programmed in javascript and uses node.js. Liri returns data from the following apis: bandsInTown, OMDB, Spotify, and Google Books. Liri is also using npm moment, npm axios and npm chalk. 
 
-![concert-this](https://github.com/amp3193/liriBot/blob/master/screen_shots.concert-this.JPG)
+![concert-this](https://github.com/amp3193/liriBot/blob/master/screen_shots/concert-this.JPG)
 
